@@ -1,0 +1,989 @@
+openapi: '3.0.0'
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/jayavaidy/PayPalFinalProject/1.0.0
+info:
+  version: '1.0.0'
+  title: "Histcyclopedia: The Story of Civilization"
+  description: A REST API for a website that provides a comprehensive history of the world
+  contact:
+    name: Jayasri Vaidyaraman
+    email: jayasrivaidy@gmail.com
+  license:
+    name: GNU license
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  termsOfService: https://opensource.org/ToS
+tags:
+  - name: Administrator
+    description: Creates and deletes accounts of the developers
+  - name: Developers
+    description: People responsible for adding, updating and modifying the website content
+  - name: Users
+    description: Consumers of the content hosted on the website.
+  - name: Quizzes and Fun Games
+    description: Contains the various quizzes developed, based on the website content
+  - name: Scoreboard
+    description: Ranking of the users based on their quiz scores
+
+paths:
+  /adminLogin:
+    post:
+      description: Administrator Login
+      summary: Admin login
+      tags:
+        - Administrator
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Administrator
+        - name: Password
+          in: cookie
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: "Welcome Administrator"
+        400:
+          description: "Invalid Administrator password"
+
+  /adminLogin/Developer:
+    post:
+      summary: Add Developer
+      description: Allows the Administrator to add a new developer
+      tags:
+        - Administrator
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                developerName:
+                  type: string
+                passwd:
+                  type: string
+              required:
+                - developerName
+                - passwd
+      responses:
+        200:
+          description: "New Developer Created"
+        400:
+          description: "Invalid username/password type"
+
+  /adminLogin/Developer/{developerName}:
+    delete:
+      summary: Delete Developer
+      description: Allows the administrator to remove an existing developer
+      tags:
+        - Administrator
+      parameters:
+        - name: developerName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Sucessfully deleted Developer
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+
+  /userLogin:
+    post:
+      summary: User Login
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                passwd:
+                  type: string
+              required:
+                - userName
+                - passwd
+      responses:
+        200:
+          description: "Sucessfully logged in"
+        400:
+          description: "Invalid username/password type"
+
+  /developerLogin:
+    post:
+      description: Developer Login
+      summary: Dev Login
+      tags:
+        - Developers
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                developerName:
+                  type: string
+                passwd:
+                  type: string
+              required:
+                - developerName
+                - passwd
+      responses:
+        200:
+          description: "Sucessfully logged in"
+        400:
+          description: "Invalid username/password type"
+
+  /{country}:
+    post:
+      summary: Add country
+      description: Allows the developers to add a country to the encyclopedia
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Sucessfully added a new country
+        400:
+          description: Error!!!
+    get:
+      summary: History of Country
+      description: Gives the user the history of the country
+      tags:
+        - Users
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Historical events of a country
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/historyCountry'
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+    patch:
+      summary: Modify Country Content
+      description: Allows the developers to modify the data of an existing country
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                Period:
+                  type: string
+                  enum:
+                    - Ancient
+                    - Medieval
+                    - Modern
+                Events:
+                  type: array
+                  items:
+                    type: string
+                  uniqueItems: true
+              required:
+                - Period
+                - Events
+      responses:
+        200:
+          description: Sucessfully modified country details
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+    delete:
+      summary: Delete Country
+      description: Allows the developers to delete the history of a country
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Sucessfully deleted country
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+
+  /{country}/{period}:
+    post:
+      summary: Add History Period
+      description: Allows the developer to create periods (ancient, medieval and modern) to classify historical events
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Ancient
+              - Medieval
+              - Modern
+      responses:
+        200:
+          description: Sucessfully created a new period for country
+        400:
+          description: Error!!!
+    get:
+      summary: Get info of events of a particular period
+      description: Allows the users to get all the events belonging to the ancient, medieval or modern period of the country's history
+      tags:
+        - Users
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Ancient
+              - Medieval
+              - Modern
+      responses:
+        200:
+          description: Sucessfully deleted country
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/historyCountry'
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+    patch:
+      summary: Modify info on particular period
+      description: Allows the developers to modify the content of a country's history in a particular period
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Ancient
+              - Medieval
+              - Modern
+      requestBody:
+          required: true
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  Events:
+                    type: array
+                    items:
+                      type: string
+                    uniqueItems: true
+                required:
+                  - Events
+      responses:
+        200:
+          description: Sucessfully modified country details
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+    delete:
+      summary: Delete historical period
+      description: Allows the developer to delete a particular period in a country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Ancient
+              - Medieval
+              - Modern
+      responses:
+        200:
+          description: Sucessfully deleted period
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+
+  /{country}/Ancient/{event}:
+    post:
+      summary: Desc. of particular event in ancient period
+      description: Allows the developers to add the details of a particular event that belongs to the ancient period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Ancient
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                eventSummary:
+                  type: string
+              required:
+                - eventSummary
+      responses:
+        200:
+          description: Sucessfully created a new event for the country in ancient period
+        400:
+          description: Error!!!
+    get:
+      summary: Get info on an event in country's ancient period
+      description: Allows the users to get all the information regarding a particular event that belongs to the ancient period in the country's history
+      tags:
+        - Users
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Ancient
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Event description
+          content:
+           text/plain:
+              schema:
+                type: string
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+    patch:
+      summary: Modify desc. of particular event in ancient period
+      description: Allows the developers to modify the details of a particular event that belongs to the ancient period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Ancient
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                eventSummary:
+                  type: string
+              required:
+                - eventSummary
+      responses:
+        200:
+          description: Sucessfully modified event for the country in ancient period
+        400:
+          description: Error!!!
+    delete:
+      summary: delete event from country's ancient period
+      description: Allows the developers to delete the details of a particular event that belongs to the ancient period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Ancient
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Sucessfully deleted event in ancient period
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+
+  /{country}/Medieval/{event}:
+    post:
+      summary: Desc. of particular event in medieval period
+      description: Allows the developers to add the details of a particular event that belongs to the medieval period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Medieval
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                eventSummary:
+                  type: string
+              required:
+                - eventSummary
+      responses:
+        200:
+          description: Sucessfully created a new event for the country in medieval period
+        400:
+          description: Error!!!
+    get:
+      summary: Get info on on an event in country's  medieval period
+      description: Allows the users to get all the information regarding a particular event that belongs to the ancient period in the country's history
+      tags:
+        - Users
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Medieval
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Event description
+          content:
+           text/plain:
+              schema:
+                type: string
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+    patch:
+      summary: Modify desc. of particular event in medieval period
+      description: Allows the developers to modify the details of a particular event that belongs to the medieval period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Medieval
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                eventSummary:
+                  type: string
+              required:
+                - eventSummary
+      responses:
+        200:
+          description: Sucessfully modified event for the country in the medieval period
+        400:
+          description: Error!!!
+    delete:
+      summary: delete event from country's medieval period
+      description: Allows the developers to delete the details of a particular event that belongs to the medieval period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Medieval
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Sucessfully deleted event in medieval period
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+
+  /{country}/Modern/{event}:
+    post:
+      summary: Desc. of particular event in modern period
+      description: Allows the developers to add the details of a particular event that belongs to the modern period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Modern
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                eventSummary:
+                  type: string
+              required:
+                - eventSummary
+      responses:
+        200:
+          description: Sucessfully created a new event for the country in modern period
+        400:
+          description: Error!!!
+    get:
+      summary: Get info on on an event in country's modern period
+      description: Allows the users to get all the information regarding a particular event that belongs to the modern period in the country's history
+      tags:
+        - Users
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Modern
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Event description
+          content:
+           text/plain:
+              schema:
+                type: string
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+    patch:
+      summary: Modify desc. of particular event in modern period
+      description: Allows the developers to modify the details of a particular event that belongs to the modern period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Modern
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                eventSummary:
+                  type: string
+              required:
+                - eventSummary
+      responses:
+        200:
+          description: Sucessfully modified event for the country in the modern period
+        400:
+          description: Error!!!
+    delete:
+      summary: delete event from country's modern period
+      description: Allows the developers to delete the details of a particular event that belongs to the modern period in the country's history
+      tags:
+        - Developers
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: period
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - Modern
+        - name: event
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Sucessfully deleted event in modern period
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+
+  /Quizzes/{country}:
+    get:
+      summary: Available quizzes
+      description: Get the list of available quizzes on a particular country's history
+      tags:
+       - Quizzes and Fun Games
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Sucessfully deleted country
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quizList'
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+
+  /Quizzes/{country}/{quizName}:
+    post:
+      summary: Create quiz
+      description: Create a new quiz for an available country
+      tags:
+       - Quizzes and Fun Games
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: quizName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                developerName:
+                  type: string
+                passwd:
+                  type: string
+              required:
+                - developerName
+                - passwd
+      responses:
+        200:
+          description: Sucessfully created a new quiz for the country
+        400:
+          description: Error!!!
+
+    patch:
+      summary: Modify quiz
+      description: Update the contents of an existing quiz
+      tags:
+       - Quizzes and Fun Games
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: quizName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                developerName:
+                  type: string
+                passwd:
+                  type: string
+                quizDesc:
+                  type: string
+              required:
+                - developerName
+                - passwd
+                - quizDesc
+      responses:
+        200:
+          description: Sucessfully modified the given quiz
+        400:
+          description: Error!!!
+    delete:
+      summary: Delete quiz
+      description: delete an existing quiz
+      tags:
+        - Quizzes and Fun Games
+      parameters:
+        - name: country
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: quizName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Sucessfully deleted quiz
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+  /leaderBoard:
+    get:
+      description: Ranking of users based on their quiz performances
+      summary: Quiz Rank
+      tags:
+        - Scoreboard
+      parameters:
+        - name: userName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Your rank is
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/rankList'
+        400:
+          description: Error!!!
+        404:
+          description: Not Found !!!!
+components:
+  schemas:
+    historyCountry:
+      type: object
+      required: [Country, Period, Events]
+      properties:
+        Country:
+          type: string
+        Period:
+          type: string
+          enum:
+            - Ancient
+            - Medieval
+            - Modern
+        Events:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+    quizList:
+      type: object
+      required: [Country, Quizzes]
+      properties:
+        Country:
+          type: string
+        Quizzes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+    rankList:
+      type: object
+      required: [name, rank]
+      properties:
+        name:
+          type: string
+        rank:
+          type: integer
